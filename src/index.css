@@ -11,3 +11,20 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.underline {
+  text-decoration: solid underline black 1px;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+h5 {
+  padding: none;
+}
+
+.cardContainer {
+  display: flex;
+}
+

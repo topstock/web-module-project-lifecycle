@@ -1,5 +1,8 @@
 import React from 'react';
-import FollowerList from './components/FollowerList'
+import FollowerList from './components/FollowerList';
+import User from './components/User';
+import axios from 'axios';
+
 class App extends React.Component {
   state = {
     profileData: {
@@ -477,34 +480,99 @@ class App extends React.Component {
       "type": "User",
       "site_admin": false
       }
-      ]
-
-    
+      ],
+      username: 'topstock',
+      input: ''
 
   }
 
+  handleChanges = (e) => {
+    this.setState({
+      ...this.state,
+      input: e.target.value
+    })
+    console.log( this.state.input);
+  }
+
+  getProfileData = () => {
+    return axios.get(`https://api.github.com/users/${this.state.username}`)
+        .then( res => { 
+          return res.data
+        })
+        .catch(err => console.error(err))
+  };
+
+
+  
+
+  getFollowersData = () => {
+    return axios.get(`https://api.github.com/users/${this.state.username}/followers`)
+    .then(res => {
+      return(res.data);
+    })
+    .catch(err => console.error(err))
+  }
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    this.setState({
+      ...this.state,
+      username: this.state.input
+    })
+  }
+  
+  componentDidUpdate() {
+    this.setState({
+      ...this.state,
+      followersData: getFollowersData()
+  }
+
+  componentDidMount() {
+    this.setState({
+      ...this.state,
+      followersData: getFollowersData()
+  }
+
+getDogImages(this.state.breed)
+
+
   render() {
+   
+      // axios.get(`https://api.github.com/users/${this.state.username}/`)
+      //   .then(res => console.log(res.data))
+      //   // .then( res => { this.setState({ ...this.state, profileData: res.data}) })
+      //   .catch( err => console.log(err))
+
+      // axios.get(`https://api.github.com/users/${this.state.username}/`)
+      //   .then(res => console.log(res.data))
+      //   // .then( res => { this.setState({ ...this.state, profileData: res.data}) })
+      //   .catch( err => console.log(err))
+
     return(<div>
       Github Card
       <h1>GITHUB INFO</h1>
       <form>
-        <input/>
-        <button placeholder="GitHub Handle">Search</button>
+        <input value={`${this.state.input}`} onChange={this.handleChanges} />
+        <button onSubmit={this.handleSubmit} placeholder='GitHub Handle'>Search</button>
       </form>
-      <section className='profileInfo'>
-        <div className='profileImage'>
-          <img width='300' src={`${this.state.profileData.avatar_url}`}/>
-        </div>
-        <div className='profileInfo'>
-          <h3 className='uppercase underline'>{`${this.state.profileData.name}`}</h3>
-          <h5 className='uppercase'>({`${this.state.profileData.login}`})</h5>
-          <p>TOTAL REPOS: {`${this.state.profileData.public_repos}`}</p>
-          <p>TOTAL FOLLOWERS: {`${this.state.profileData.followers}`}</p>
-        </div>
-      </section>
+      <User 
+        userImgURL={this.state.profileData.avatar_url} 
+        userLogin={this.state.profileData.login}
+        userName={this.state.profileData.name}
+        userFollowers={this.state.profileData.followers} 
+        userRepos={this.state.profileData.public_repos}
+      />
       <div className='followersList'>
         <h3>FOLLOWERS</h3>
-        {/* <FollowerList props={this.state.followersData}/> */}
+          <FollowerList 
+          followersData={this.state.followersData.map( follower => {
+            return {
+              followerLogin: follower.login,
+              followerImgUrl: follower.avatar_url,
+              followerId: follower.id
+            }
+          })}
+          /> 
       </div>
     </div>);
   }
